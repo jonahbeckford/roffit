@@ -442,6 +442,7 @@ sub parsefile {
 
                 $rest =~ s/\"//g; # cut off quotes
                 $rest = do_encode($rest);
+                $rest = handle_italic_bold $rest;
                 $rest = ucfirst(lc($rest)) if(!$leavecase);
                 $out = "<a name=\"$name\"></a><h2 class=\"nroffsh\">$rest</h2>";
                 $indentlevel=0;
