@@ -416,6 +416,13 @@ sub parsefile {
                 $indentlevel=0;
                 $within_tp=0;
             }
+            elsif($keyword =~ /^(P|LP|PP)$/i) {
+                # start of a new paragraph coming up
+                showp(@p);
+                @p="";
+                # indentation is cleared. confer: man 7 groff_man
+                $indentlevel-- if ($indentlevel);
+            }
             elsif($keyword =~ /^B$/i) {
                 $rest =~ s/\"//g; # cut off quotes
                 $rest = do_encode($rest);
