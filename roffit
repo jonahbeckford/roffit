@@ -28,7 +28,12 @@ use strict;
 use HTML::Entities qw(encode_entities);
 use File::Basename;
 sub do_encode($) {
-    return encode_entities(shift, q{<>&"'#});
+    my $txt = shift;
+    # unescape \N'n' escape sequences (https://man7.org/linux/man-pages/man7/groff.7.html)
+    # ex. \N'46' is chr(46) which is a forward slash (/)
+    $txt =~ s/\\N'([0-9]+)'/chr($1)/eg;
+
+    return encode_entities($txt, q{<>&"'#});
 }
 
 my $InFH = \*STDIN;
@@ -577,6 +582,7 @@ sub parsefile {
             my $txt = $in;
 
             $txt =~ s/\\&//g;
+
 	    # Must come after previous substitution or it could munge some entities.
 	    $txt = do_encode($txt);
             $txt =~ s/\\-/-/g;
