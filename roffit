@@ -48,6 +48,7 @@ my $leadingunindent=0;
 my @p;
 my $within_tp;
 my $standalone=1; # by default we make stand-alone HTML pages
+my $logo=1;
 my $pre;
 my %anchor; # hash with all anchors
 
@@ -71,6 +72,10 @@ while($ARGV[0]) {
         $leavecase = 1;
         exit;
     }
+    elsif($ARGV[0] eq "--no-logo") {
+        $logo = 0;
+        shift @ARGV;
+    }
     elsif($ARGV[0] =~ /^--mandir=(.*)/) {
         # check for other HTMLized man pages in these given dirs
         # can be specified multiple times
@@ -92,6 +97,7 @@ while($ARGV[0]) {
             "                 dir we prefix the HTML file name with in the output\n",
             " --mandir=<dir>  check for other HTMLized man pages in these dirs\n",
             " --preserve-case leave case of section headers untouched\n",
+            " --no-logo       do not add: This HTML page was made with roffit\n",
             " --version       display roffit version and exit\n";
             
         exit;
@@ -702,7 +708,7 @@ print $OutFH <<ROFFIT
 <p class="roffit">
  This HTML page was made with <a href="https://daniel.haxx.se/projects/roffit/">roffit</a>.
 ROFFIT
-    ;
+    if $logo;
 
 if($standalone) {
     print "</body></html>\n";
