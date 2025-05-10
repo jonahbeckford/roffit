@@ -44,6 +44,7 @@ my %manpage;
 my @out;
 
 my $indentlevel=0; # logical levels, not columns
+my $leadingunindent=0;
 my @p;
 my $within_tp;
 my $standalone=1; # by default we make stand-alone HTML pages
@@ -105,10 +106,26 @@ sub strlen($) { defined($_[0]) ? length($_[0]) : 0; }
 
 sub showp {
     my @p = @_;
-    if(@p && join("", @p)) {
-        push @out, "\n<p class=\"level$indentlevel\">" if(!$pre);
-        push @out, @p;
-        push @out, "</p>" if(!$pre);
+    if(@p) {
+        if($leadingunindent) {
+            push @out, "\n<p class=\"level$indentlevel\">" if(!$pre);
+            push @out, "\n<div class=\"lead-unindent\">";
+            # get leading non-empty line
+            my $first = shift @p;
+            $first = shift @p if (!$first);
+            push @out, $first;
+            push @out, "</div>";
+            push @out, "\n<div class=\"rest-indent\">";
+            push @out, @p;
+            push @out, "</div>";
+            push @out, "</p>" if(!$pre);
+            $leadingunindent=0;
+        }
+        elsif (join("", @p)) {
+            push @out, "\n<p class=\"level$indentlevel\">" if(!$pre);
+            push @out, @p;
+            push @out, "</p>" if(!$pre);
+        }
     }
 }
 
@@ -130,6 +147,14 @@ P.level1, pre.level1 {
 
 P.level2, pre.level2 {
  padding-left: 6em;
+}
+
+div.lead-unindent {
+ padding-left: 2em;
+}
+
+div.rest-indent {
+ padding-left: 4em;
 }
 
 span.emphasis {
@@ -473,7 +498,12 @@ sub parsefile {
                 # controlling in the CSS instead.
                 $within_tp=1;
                 showp(@p);
-                @p="";                
+                @p="";
+
+                # TP has a leading unindented line; the
+                # remainder is indented. We decide CSS for that as well.
+                # Confer: man 7 groff_man
+                $leadingunindent=1;
             }
             elsif($keyword =~ /^IP$/i) {
                 # start of a new paragraph coming up
