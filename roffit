@@ -617,7 +617,7 @@ sub parsefile {
             else {
                 showp(@p);
                 @p="";
-                printf $debugFH "Error: unknown keyword \"$keyword\" on %s:$lineno\n",
+                printf $debugFH "roffit warning: unknown keyword \"$keyword\" on %s:$lineno\n",
                 $filename?$filename:"<unknown>";
             }
         }
